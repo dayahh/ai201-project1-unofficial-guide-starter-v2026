@@ -67,6 +67,12 @@ Parking is the constraint rather than driving. Both Halden Bay lots fill by
 **Question:**
 "Is Kestrelford good to walk in snow"
 **Answer:**
+(best distance 0.426, cutoff 0.5)
+
+According to `guide_walking.md`, the Kestrelford approach road is impassable in snow because it is not gritted above the second village, which can cut the town off for a day or two most winters.
+
+Sources retrieved: guide_kestrelford.md, guide_regional_transport.md, guide_thornby_wells.md, guide_walking.md
+
 #   distance   source                           preview
 ----------------------------------------------------------------------------------------------------
 1   0.4289     guide_walking.md                 harder going than the distance suggests. The single ...
