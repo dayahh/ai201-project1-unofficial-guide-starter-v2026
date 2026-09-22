@@ -6,7 +6,7 @@ Five criteria that say what "working" means for this system, written in unit 1
 An acceptance criterion names a target: a number, a count, a rate, or something
 a person could plainly observe. *"Retrieval works"* is an opinion. *"For at
 least 4 of my 5 test questions, the top results include a chunk containing the
-answer"* is a criterion.
+answer"* is a criterion. Catches profanity in at least 9 of 10 trials. When the search tool returns nothing, the agent says so and moves on instead of crashing — in all 5 of my triggered failures.
 
 Under each one, write a sentence or two on **why that target** and not a
 stricter or looser one. A reason that says something about your corpus or your
@@ -56,6 +56,7 @@ in at least 4 of 5 tries.
 ---
 
 ## 4. Something about your chunks
+At least 3 sampled chunks read as a complete thought, with no sentence cut in half at either end.
 
 <!-- YOU WRITE THIS ONE.
 
@@ -72,12 +73,13 @@ in at least 4 of 5 tries.
 
 
 **Why this target:**
-
+My corpus includes short headings and forum replies, and I saw a few chunks that were too broken up to be useful. This target checks that each chunk stands on its own as a meaningful unit of information instead of a fragment.
 
 
 ---
 
-## 5. Your choice
+## 5. Your choice, Retrieval stays fast enough to use
+The system answers a question in under 30 seconds on a standard laptop.
 
 <!-- YOU WRITE THIS ONE TOO.
 
@@ -90,7 +92,7 @@ in at least 4 of 5 tries.
 
 
 **Why this target:**
-
+I want the system to feel usable in class, not like a background job that takes forever. My corpus is small enough that a full index and query under five minutes is a realistic threshold for a working local prototype.
 
 
 ---
