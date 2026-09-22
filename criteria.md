@@ -25,7 +25,7 @@ contains the answer.
 **Why this target:**
 <!-- e.g. "One of my questions is about a topic only two documents mention, so
      I expect that one to be hard." -->
-
+I chose this threshold because the city guides corpus is built from short, practical notes, so the answer should usually live in one clear chunk. If the top results regularly miss the answer, then the retrieval stage is not finding the right passage even when the corpus contains it. A target of 4 of 5 is strict enough to catch retrieval failures without being unrealistic for a small corpus.
 ---
 
 ## 2. Every answer names a source
@@ -35,7 +35,7 @@ Every answer the system produces names at least one source document.
 **Why this target:**
 <!-- Why all five and not four? What about your setup makes that achievable —
      or what would have to go wrong for it not to be? -->
-
+Source attribution matters because travel advice needs to be traceable back to a real guide entry. If the model gives an answer without naming a document, it may be guessing or mixing facts from different places. Requiring a source on every answer makes the system more trustworthy and easier to check.
 ---
 
 ## 3. The relevance gate stops out-of-corpus questions
@@ -52,6 +52,8 @@ in at least 4 of 5 tries.
 **Why this target:**
 <!-- What did your distances look like when you set the cutoff in Milestone 4?
      Was there a clean gap, or did the two groups overlap? -->
+
+There was a clean gap between the two groups. For example, the questions out of scope had distances that were very high, and I knew that was not the kind of response users needed from a tool like this. The questions I built that were actually from the documents itself had much lower numbers. So distances close to 0.4 and 0.3, I ended up choosing the 0.5 cutoff as a balance.
 
 ---
 
@@ -88,9 +90,7 @@ The system answers a question in under 30 seconds on a standard laptop.
      handles badly, about source attribution being correct rather than merely
      present — anything, as long as it names a number or an observable
      outcome. -->
-
-
-
+     
 **Why this target:**
 I want the system to feel usable in class, not like a background job that takes forever. My corpus is small enough that a full index and query under five minutes is a realistic threshold for a working local prototype.
 

@@ -1,6 +1,6 @@
 # The Unofficial Guide
-
-<!-- Replace this line with your name and which corpus you picked. -->
+Adaya Head
+Tool can review the city_guides corpus.
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -21,26 +21,16 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This project indexes the city guides corpus and answers practical travel questions about places, transport, food, and local conditions. It reads guide files, chunks them into short, self-contained units, retrieves the most relevant chunks for a question, and then uses the model to answer from those results. The goal is to help travelers find useful local information quickly without searching through the full guide manually.
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 2 sentences  
+**Overlap:** 1 sentence
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+Chunks are usually two sentences as long and stay on one practical idea, so at least four or five sample chunks contain a complete thought and do not break across unrelated topics. 
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
-
-     Milestone 3. -->
+This works for the city guides corpus because most sections describe one practical fact or recommendation in a short paragraph, such as a place to eat. A two sentence trunk keeps the idea complete without mixing multiple topics together.
 
 ## Sample Chunks
 ======================================================================
@@ -74,9 +64,6 @@ Parking is the constraint rather than driving. Both Halden Bay lots fill by
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
 **Question:**
 "Is Kestrelford good to walk in snow"
 **Answer:**
@@ -95,15 +82,6 @@ Gate: best distance 0.429 is under the 0.6 cutoff
 
 **My relevance cutoff:**
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
-
      I have decided to use 0.5 as my relevance cutoff. I'm using this number because most distances for each response to my questions had better results at the 0.4 or 0.5 mark and I want to keep that number as low as possible. For my questions that I came up with, these answers were easily found in the documentation, so their numbers ran low like 0.3 or 0.5 distance wise. For the questions that were out of scope, their numbers were very high like 0.7 or 0.9. The gap came when questions were out of scope so the distances were all higher than an in scope question.
 
 | Question | In corpus? | Best distance |
@@ -121,23 +99,13 @@ Gate: best distance 0.429 is under the 0.6 cutoff
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
-
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
-
-     Milestone 5. -->
-
 **1.**
+I used AI to help me understand how to break down city_guides into proper chunks. This was a crucial part of the project as I didn't understand "chunks" as a key word for this project. Copilot was used to break down my thought process and allowed me to understand the proper next steps.
+
+For example, I wanted to simply break down chunks as two sentences per chunk, but Copilot explained that the project needs deeper thinking. Chunks need to consider a whole lot of context before being separated and this idea was explained multiple times through this project as I set up my questions to ask and understood the types of responses I got back from the tool.
 
 **2.**
-
-<!-- ── Stretch features ─────────────────────────────────────────────────────
-     Doing one? Say so here BEFORE you start. A feature this README never
-     claims earns nothing.
-     ───────────────────────────────────────────────────────────────────────── -->
+I used AI to help me complete the chunker function. I did not understand how to parse words myself, so I talked it through with Copilot. Copilot suggested one fix and I went through the solution line by line, especially because I saw it add and delete imports, which I didn't know was an appropriate response yet. It's solution helped me complete this project!
 
 ---
 
