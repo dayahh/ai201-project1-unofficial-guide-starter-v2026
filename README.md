@@ -43,40 +43,34 @@
      Milestone 3. -->
 
 ## Sample Chunks
+======================================================================
+Chunk 1  |  source: guide_accessibility.md#0  |  produced by: chunker.py::split_documents
+======================================================================
+An honest assessment rather than a promotional one. Some of these places are
+difficult and it is better to know in advance.
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
+======================================================================
+Chunk 2  |  source: guide_corry_vale.md#7  |  produced by: chunker.py::split_documents
+======================================================================
+There is a farm shop at the valley mouth that sells bread, cheese and little else, and it closes at 4pm. Bring supplies; this is not a place with options.
 
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
+======================================================================
+Chunk 3  |  source: guide_givens_mill.md#3  |  produced by: chunker.py::split_documents
+======================================================================
+Everything is on one street along the river. The mill is at one end and the church at the other, eight minutes apart.
 
-     Milestone 3. -->
+======================================================================
+Chunk 4  |  source: guide_kestrelford.md#15  |  produced by: chunker.py::split_documents
+======================================================================
+The nearest full hospital is in Brightwater; there is
+a minor injuries unit locally with limited hours.
 
-**Chunk 1** — source: `` — produced by: ``
+======================================================================
+Chunk 5  |  source: guide_regional_transport.md#8  |  produced by: chunker.py::split_documents
+======================================================================
+Parking is the constraint rather than driving. Both Halden Bay lots fill by
+10am on summer weekends.
 
-```
-```
-
-**Chunk 2** — source: `` — produced by: ``
-
-```
-```
-
-**Chunk 3** — source: `` — produced by: ``
-
-```
-```
-
-**Chunk 4** — source: `` — produced by: ``
-
-```
-```
-
-**Chunk 5** — source: `` — produced by: ``
-
-```
-```
 
 ## Sample Answer
 

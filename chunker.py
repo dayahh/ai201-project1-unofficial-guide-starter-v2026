@@ -22,6 +22,7 @@ to it, write down what you saw, and move on. That's a real observation about
 your pipeline, not giving up.
 """
 
+import re
 from dataclasses import dataclass
 
 import config
@@ -81,23 +82,71 @@ def fallback_split(
 
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
-    """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    """Chunk by paragraph and sentence so each chunk keeps one complete idea."""
+    chunks: list[Chunk] = []
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    def flush_current(current: list[str], source: str, source_index: int) -> None:
+        if not current:
+            return
+        text = " ".join(current).strip()
+        if not text:
+            return
+        chunks.append(
+            Chunk(
+                text=text,
+                source=source,
+                index=source_index,
+                produced_by="chunker.py::split_documents",
+            )
+        )
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
+    for doc in documents:
+        text = doc.text.strip()
+        if not text:
+            continue
 
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
-    """
-    return fallback_split(documents)
+        blocks = re.split(r"\n\s*\n+", text)
+        source_index = 0
+        for block in blocks:
+            block = block.strip()
+            if not block:
+                continue
+
+            # Skip markdown headings and title-only lines such as "# Marchwood"
+            # or "## Eat and drink" — those are not answer-bearing chunks.
+            if re.fullmatch(r"#+\s*.*", block):
+                continue
+
+            # Also skip tiny title-like fragments that do not read as a real fact.
+            if len(block) < 50 and not any(ch in block for ch in ".!?"):
+                continue
+
+            sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", block) if s.strip()]
+            if not sentences:
+                continue
+
+            current: list[str] = []
+            for sentence in sentences:
+                current.append(sentence)
+                combined = " ".join(current)
+
+                # For city-guide text, the useful unit is usually one fact or
+                # a short pair of related sentences. Keep complete thoughts
+                # together, but do not let a heading or tiny fragment become a
+                # chunk on its own.
+                if len(current) >= 2 or len(combined) >= 280:
+                    flush_current(current, doc.source, source_index)
+                    current = []
+                    source_index += 1
+
+            if current:
+                flush_current(current, doc.source, source_index)
+                source_index += 1
+
+    if not chunks:
+        return fallback_split(documents)
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
