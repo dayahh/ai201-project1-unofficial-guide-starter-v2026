@@ -25,7 +25,7 @@ QUESTIONS = [
     # {"question": "...", "expects": "..."},
     {"question": "What do students say about good places to eat Outside Marchwood?", "expects": "Kestrelford's"},
     {"question": "When does Brightwater's Tuesday market close?", "expects": "1pm"},
-    {"question": "IS Halden Bay's seafood fresh?", "expects": "yes"},
+    {"question": "Is Halden Bay's seafood fresh?", "expects": "yes"},
     {"question": "What does Corry Vale sell", "expects": "bread and cheese"},
     {"question": "Is Kestrelford good to walk in snow", "expects": "no"},
 ]

@@ -78,8 +78,17 @@ Parking is the constraint rather than driving. Both Halden Bay lots fill by
      visible. Milestone 4. -->
 
 **Question:**
-
+"Is Kestrelford good to walk in snow"
 **Answer:**
+#   distance   source                           preview
+----------------------------------------------------------------------------------------------------
+1   0.4289     guide_walking.md                 harder going than the distance suggests. The single ...
+2   0.5413     guide_kestrelford.md             # Kestrelford  Kestrelford is a hill town of 12,000,...
+3   0.5668     guide_regional_transport.md      car park is free and involves a steep walk up.  ## W...
+4   0.5976     guide_walking.md                 # Walking in the region  ## Easy, on good surfaces  ...
+5   0.6269     guide_regional_transport.md      oncentrate on weekday daytimes. Sunday service is mi...
+
+Gate: best distance 0.429 is under the 0.6 cutoff
 
 ```
 ```
@@ -95,9 +104,20 @@ Parking is the constraint rather than driving. Both Halden Bay lots fill by
 
      Milestone 4. -->
 
+     I have decided to use 0.5 as my relevance cutoff. I'm using this number because most distances for each response to my questions had better results at the 0.4 or 0.5 mark and I want to keep that number as low as possible. For my questions that I came up with, these answers were easily found in the documentation, so their numbers ran low like 0.3 or 0.5 distance wise. For the questions that were out of scope, their numbers were very high like 0.7 or 0.9. The gap came when questions were out of scope so the distances were all higher than an in scope question.
+
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| What do students say about good places to eat Outside Marchwood? | Yes | 0.456 |
+| When does Brightwater's Tuesday market close? | Yes | 0.394 |
+| Is Halden Bay's seafood fresh? | Yes | 0.396 |
+| What does Corry Vale sell | Yes | 0.476 |
+| Is Kestrelford good to walk in snow | Yes | 0.429 |
+| What is the capital of Mongolia? | No | 0.887 |
+| How do I change the oil in a diesel engine? | No | 0.897 |
+| Who won the 1994 World Cup? | No | 0.903 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.829 |
+| How do I write a for loop in Rust? | No | 0.853 |
 
 ## How I Used AI
 
