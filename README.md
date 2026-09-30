@@ -270,8 +270,10 @@ One more observation: the old chunks didn't stop criterion 1 from passing. The 8
 ## The Improvement
 
 **What I changed:**
+Criterion 4 diagnosis is having an issue with being successful. Rebuilt the index with python app.py index, so the system searches chunks made by chunker.py::split_documents instead of the stale 800-character fallback_split chunks
 
-**Why I picked it:**
+**Why I picked it:** 
+My criterion 4 diagnosis found every indexed chunk came from fallback_split; rebuilding the index is the direct fix for that miss.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -281,15 +283,82 @@ One more observation: the old chunks didn't stop criterion 1 from passing. The 8
 <!-- Same format, same five criteria, three runs each.
      `python run_eval.py --label after` -->
 
+Results file: `results/run_2026-09-30_0047_after.md`, produced by `run_eval.py::main` (3 runs per question, cache off) after rebuilding the index with `python app.py index`. The new index holds 197 chunks, 136 characters on average (shortest 22, longest 277), all produced by `chunker.py::split_documents`. Nothing else changed: same corpus, same model, top-k 5, cutoff 0.5, same prompt. Criteria 1, 4 and 5 were measured the same way as in the Before log.
+
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 4/5 | 4/5 | 4/5 | MISSED |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Sampled chunks read as a complete thought | at least 3 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. Answers in under 30 seconds | 5 of 5 under 30 s | 5/5 | 5/5 | 5/5 | MET |
+
+**Before vs after, side by side:**
+
+| Criterion | Before (runs 1/2/3) | After (runs 1/2/3) | Change |
+|---|---|---|---|
+| 1. Retrieved chunk contains the answer | 5/5, 5/5, 5/5 — MET | 4/5, 4/5, 4/5 — MET | worse by one question |
+| 2. Every answer names a source | 4/5, 4/5, 5/5 — MISSED | 4/5, 4/5, 4/5 — MISSED | no better (lost run 3's lucky 5/5) |
+| 3. Gate stops out-of-corpus questions | 5/5 — MET | 5/5 — MET | same |
+| 4. Sampled chunks read as a complete thought | 0/5, 0/5, 0/5 — MISSED | 5/5, 5/5, 5/5 — MET | fixed |
+| 5. Answers in under 30 seconds | 5/5 (max 4.7 s) — MET | 5/5 (max 17.9 s) — MET | same verdict |
+
+### Real output (after)
+
+**Criterion 1** — `store.py::search`, "What do students say about good places to eat Outside Marchwood?". This is the question that now fails. Chunk #1 (guide_eating.md, distance 0.4680):
+```
+This catches visitors out more than anything else. Outside Marchwood, kitchens
+across the region stop serving at 9pm and often earlier.
+```
+The next sentence in `guide_eating.md`, "Kestrelford's pubs serve 12 to 2 and 6 to 8:30…", is now in a different chunk that isn't in the top 5. None of the 5 retrieved chunks contains "Kestrelford's".
+
+A passing one, "When does Brightwater's Tuesday market close?", chunk #1 (guide_eating.md, distance 0.2657, was 0.3940 before):
+```
+Kestrelford's Saturday market has run since the 1400s and is the region's best,
+though much reduced from November to February. Brightwater's Tuesday market
+sets up at 7am in the square and is finished by 1pm.
+```
+
+**Criterion 2** — `run_eval.py::main`, Marchwood question, run 3 (named a source before, doesn't now):
+```
+I do not have enough information to answer what students say about good places to eat outside Marchwood.
+```
+
+**Criterion 3** — `run_eval.py::check_out_of_scope`, cutoff 0.5, refused 5 of 5:
+```
+| What is the capital of Mongolia? | 0.778 | refused |
+| How do I change the oil in a diesel engine? | 0.880 | refused |
+| Who won the 1994 World Cup? | 0.714 | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.849 | refused |
+| How do I write a for loop in Rust? | 0.870 | refused |
+```
+
+**Criterion 4** — `store.py::search`, "Is Halden Bay's seafood fresh?", chunks #1 and #3. Every chunk is now labelled `produced_by=chunker.py::split_documents`:
+```
+Halden Bay's seafood is genuinely fresh � the two harbour restaurants buy
+directly from boats that land in the early morning. Givens Mill's tearoom sells
+bread made from flour ground twenty metres away.
+```
+```
+Seafood, unsurprisingly, and it is genuinely fresh � the boats land in the early morning and the two harbour restaurants buy directly. Prices on the harbour front are roughly double those on Fell Street, one level up, for comparable food.
+```
+
+**Criterion 5** — `app.py ask`, seconds per question (Marchwood, Brightwater, Halden Bay, Corry Vale, Kestrelford), cache off:
+```
+run 1: 4.1 4.2 4.1 4.1 4.1
+run 2: 4.1 4.1 4.1 4.1 4.6
+run 3: 8.7 17.9 4.2 4.6 4.1
+```
 
 **Did it help?**
+
+Yes for the miss it was aimed at, but it wasn't free. Criterion 4 went from 0/5 to 5/5 in every run: every retrieved chunk now starts and ends on a full sentence. Distances also got much tighter. Halden Bay's best match went from 0.396 to 0.148 and Brightwater's from 0.394 to 0.266, so the right chunk now stands out more clearly.
+
+It made criterion 1 slightly worse. The Marchwood question went from pass to fail because two-sentence chunks split "Outside Marchwood, kitchens… stop serving at 9pm" apart from "Kestrelford's pubs serve…". The old 800-character windows held both. Criterion 1 still meets its 4-of-5 target, but only just.
+
+It didn't fix criterion 2, which I expected: that miss is in the prompt, not the chunks. The Marchwood question now refuses without a source in all three runs instead of two. The one run that happened to list sources before was luck, not a fix.
+
+How I know: same five questions, same cutoff and prompt, three runs each, before and after files both in `results/`.
 
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit
