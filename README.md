@@ -113,6 +113,9 @@ For example, I wanted to simply break down chunks as two sentences per chunk, bu
 **2.**
 I used AI to help me complete the chunker function. I did not understand how to parse words myself, so I talked it through with Copilot. Copilot suggested one fix and I went through the solution line by line, especially because I saw it add and delete imports, which I didn't know was an appropriate response yet. It's solution helped me complete this project!
 
+**3.**
+I used AI in Unit 2 to help me understand where the issues were in my criteria and how to fix it. At first, I didn't understand how to retrace my steps with the rules I made. Claude was able to re run the tests for me and called out where the criteria broke and why I wasn't getting the results I needed. Having a partner to help with understanding the problem made me successful in this project.
+
 ---
 
 # Unit 2
@@ -377,9 +380,16 @@ How I know: same five questions, same cutoff and prompt, three runs each, before
 
      Milestone 5. -->
 
+**Criterion 2 is still missed (4/5 in all three runs).** The Marchwood question gets a refusal with no source, because `GROUNDING_INSTRUCTION` in `generate.py` only asks for a source on real answers. Next I'd add a rule that every answer, including "I don't have enough information", ends with the files it checked.
+
+**Criterion 1 still passes, but only just (4/5).** The new two-sentence chunks split the Marchwood answer across two chunks. I'd add one sentence of overlap between chunks in `split_documents` so neighboring facts stay together.
+
+I stopped here because the unit allows only one change, and I chose the index rebuild because it fixed a miss completely. Changing the prompt as well would have mixed two changes together, and I couldn't have told which one moved the numbers.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+I would rewrite my criteria more specifically. Some of the problems I ran into was the index was never rebuilt with my new chunker. I could have done better with specifying how I want it to think and where it should pull that information from. This was at first related to criteria 4, where I wanted the tool to pull from least 3 sampled chunks read as a complete thought, with no sentence cut in half at either end. I'd rewrite criterion 4 as "At least 3 of the 5 chunks returned by retrieval for each question start and end on a full sentence," because "sampled chunks" didn't say where to sample from — app.py chunks showed clean chunks while the index held broken ones.
