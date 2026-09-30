@@ -200,13 +200,22 @@ run 3: 4.1 4.1 4.2 4.2 4.2
 
      Milestone 2. -->
 
+All five verdicts use the targets in `criteria.md` exactly as I wrote them in unit 1. A target counts as MET only if it held in all three runs.
+
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunks contain the answer (target 4 of 5) | MET | For all 5 questions, at least one of the top 5 chunks contained the `expects` answer, and retrieval gave the same chunks every run, so 5/5 three times clears 4 of 5. |
+| 2 | Every answer names a source (target 5 of 5) | MISSED | The Marchwood answer named no source in runs 1 and 2, so the runs came out 4, 4, 5, and a 5-of-5 target has to hold every run, not just once. |
+| 3 | Gate stops out-of-corpus questions (target 4 of 5) | MET | All 5 `OUT_OF_SCOPE` questions had a best distance of 0.829 or higher against my 0.5 cutoff and were refused, so 5/5 clears 4 of 5. |
+| 4 | Sampled chunks read as a complete thought (target at least 3) | MISSED | I checked the top 5 chunks the system actually retrieved for three questions, and all 15 started or ended mid-sentence, so 0 of 5 each time is well short of 3. |
+| 5 | Answers in under 30 seconds (target under 30 s) | MET | I timed all five questions three times with the cache off; every answer took between 4.1 and 4.7 seconds, so all 15 were under 30 seconds. |
+
+**The close calls, and the case for the opposite verdict:**
+
+- **Criterion 1 is the closest.** The Marchwood question asks what *students* say, and no document mentions students. I counted it as a pass because chunk #3 contains the answer I wrote down in advance ("Kestrelford's pubs serve 12 to 2 and 6 to 8:30…"). The case for MISSED: the chunk answers "where can I eat outside Marchwood", not the question I actually asked. Even if I count Marchwood as a fail, the result is 4/5 in every run, which still meets the 4-of-5 target, so the verdict stays MET either way.
+- **Criterion 2:** run 3 did reach 5/5, and it's tempting to call the criterion met on that run. I didn't, because the target has to hold across all three runs, and a source that shows up one time in three is not "every answer".
+- **Criterion 4:** the criterion doesn't say where to sample from. `python app.py chunks` re-runs my chunker and gives clean chunks (the Unit 1 samples above would pass), but those aren't the chunks the system searches. I judged the chunks in the index because that's what answers questions, and it's the reading that shows the real problem.
+- **Criterion 5 is not close**, but the target was set low. The slowest answer took 4.7 seconds against a 30-second target, and I'd tighten it next time.
 
 ## Diagnoses
 
