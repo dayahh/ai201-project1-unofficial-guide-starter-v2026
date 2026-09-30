@@ -237,6 +237,36 @@ All five verdicts use the targets in `criteria.md` exactly as I wrote them in un
 
      Milestone 3. -->
 
+I have two misses in the system. These are criteria 2 and 4. The following are the diagnoses.
+
+### Criterion 2 — Every answer names a source (MISSED: 4/5, 4/5, 5/5)
+
+**Stage: generation.**
+
+**What happened:** The Marchwood question ("What do students say about good places to eat Outside Marchwood?") passed the gate at 0.4654, but in runs 1 and 2 the model answered "I do not have enough information…" and named no source.
+
+**How I found the stage:** I worked backwards from the chunks. Retrieval for that question returned chunk #3 from `guide_eating.md`, which contains "Outside Marchwood, kitchens across the region stop serving at 9pm… Kestrelford's pubs serve 12 to 2 and 6 to 8:30". The material was there, so loading, chunking and retrieval did their job and the problem is after them.
+
+**Mechanism:** The prompt in `generate.py` (`GROUNDING_INSTRUCTION`) gives the model two rules that pull against each other: "If the documents don't cover the question, say you don't have enough information" and "Name the document your answer came from." My question asks what *students* say, and no guide mentions students, so the model takes the first rule and refuses. A refusal has no "document your answer came from", so nothing tells it to cite anything, and it drops the source. In run 3 it happened to list the three files anyway, which is why the result moves between runs. The citation rule only covers real answers, not refusals.
+
+### Criterion 4 — Sampled chunks read as a complete thought (MISSED: 0/5, 0/5, 0/5)
+
+**Stage: chunking.** More exactly, the index was built with the wrong chunker.
+
+**What happened:** All 15 retrieved chunks I checked start or end mid-sentence, some mid-word — e.g. `oncentrate on weekday daytimes…` and `…kitchens across the region stop serving at 9p`.
+
+**How I found the stage:** Every chunk that comes back from `store.py::search` is labelled `produced_by=chunker.py::fallback_split`, not `chunker.py::split_documents`.
+
+**Mechanism:** `fallback_split` is the starter's original chunker. It cuts every 800 characters with 120 overlap (`CHUNK_SIZE` / `CHUNK_OVERLAP` in `config.py`) wherever that lands, so chunks begin and end in the middle of sentences and words, and they include `#` headings. In unit 1 I rewrote `split_documents` to split on paragraphs and sentences, but I never re-ran `python app.py index` afterwards, so the Chroma index still holds the old chunks. I didn't notice because `python app.py chunks` runs the chunker fresh instead of reading the index. That's why my Unit 1 sample chunks look clean and are labelled `split_documents`, even though the system has never searched them.
+
+### Pattern across the misses
+
+The two misses don't share a cause: one is in generation (the prompt has no rule for citing on a refusal), the other is in chunking (a stale index built by the old chunker). They are two separate problems, not one.
+
+There is one link. The Marchwood question is behind the criterion 2 miss and the only close call in criterion 1, because it asks about "students" in a corpus of city guides that never mentions them. Part of the problem is my question wording, not just the system.
+
+One more observation: the old chunks didn't stop criterion 1 from passing. The 800-character windows are big enough that the answer usually sits somewhere inside one, so retrieval still found it. Bad chunk boundaries hurt readability and precision here more than they hurt whether the answer is found.
+
 ## The Improvement
 
 **What I changed:**
