@@ -123,27 +123,71 @@ I used AI to help me complete the chunker function. I did not understand how to 
 
 ## Run Log — Before
 
-<!-- Your five criteria, three runs each. `python run_eval.py --label before`
-     runs the questions, puts the OUT_OF_SCOPE ones through the gate, and
-     writes it all into results/ for you. Targets come from criteria.md; the
-     verdict column is your call.
-
-     Criterion 3 is measured in one deterministic pass rather than three, so
-     the same number goes in all three run columns. That's correct, not lazy.
-
-     Milestone 1. -->
+Results file: `results/run_2026-09-23_1831.md`, produced by `run_eval.py::main` (3 runs per question, cache off). `run_eval.py` doesn't measure criteria 1, 4 and 5 directly, so I measured those separately with no changes to the system since that run.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 4/5 | 4/5 | 5/5 | MISSED |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Sampled chunks read as a complete thought | at least 3 of 5 | 0/5 | 0/5 | 0/5 | MISSED |
+| 5. Answers in under 30 seconds | 5 of 5 under 30 s | 5/5 | 5/5 | 5/5 | MET |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+How each row was counted:
+- **1** — `python app.py retrieve` / `store.py::search`, top 5 per question; checked whether any chunk contains the `expects` answer from `questions.py`. Retrieval is deterministic, so the same count goes in all three columns.
+- **2** — counted answers in the results file that name a source file.
+- **3** — `run_eval.py::check_out_of_scope`, one deterministic pass, so the same number goes in all three columns.
+- **4** — the chunks the system actually searches, not a fresh re-chunk: run 1 = the top 5 retrieved for the Marchwood question, run 2 = Halden Bay, run 3 = Kestrelford. A chunk counts only if it starts and ends on a full sentence.
+- **5** — timed `python app.py ask` on all five questions, cache off (`AI201_CACHE=0`), three rounds.
+
+### Real output
+
+**Criterion 1** — `store.py::search`, "When does Brightwater's Tuesday market close?", chunk #1 (guide_eating.md, distance 0.394):
+```
+Kestrelford's Saturday market has run since the 1400s and is the region's best,
+though much reduced from November to February. Brightwater's Tuesday market
+sets up at 7am in the square and is finished by 1pm.
+```
+
+**Criterion 2** — `run_eval.py::main`, "What do students say about good places to eat Outside Marchwood?", run 1 (passed the gate at 0.4654, no source named):
+```
+I do not have enough information to answer what students say about good places to eat outside Marchwood, as the documents do not mention students.
+```
+Compare a passing answer, "When does Brightwater's Tuesday market close?", run 1:
+```
+Brightwater's Tuesday market is finished by 1pm. 
+
+Source: guide_eating.md
+```
+
+**Criterion 3** — `run_eval.py::check_out_of_scope`, cutoff 0.5, refused 5 of 5:
+```
+| What is the capital of Mongolia? | 0.887 | refused |
+| How do I change the oil in a diesel engine? | 0.897 | refused |
+| Who won the 1994 World Cup? | 0.903 | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.829 | refused |
+| How do I write a for loop in Rust? | 0.853 | refused |
+```
+
+**Criterion 4** — `store.py::search`, "Is Halden Bay's seafood fresh?", chunk #2 (guide_eating.md). Every chunk in the index is labelled `produced_by=chunker.py::fallback_split`:
+```
+its best on a weekday
+morning.
+
+## Local specifics
+```
+Chunk #4 of the same query starts mid-word:
+```
+oncentrate on weekday daytimes. Sunday service is minimal to non-existent
+outside the Brightwater town routes.
+```
+
+**Criterion 5** — `app.py ask`, seconds per question (Marchwood, Brightwater, Halden Bay, Corry Vale, Kestrelford):
+```
+run 1: 4.2 4.2 4.1 4.1 4.7
+run 2: 4.2 4.2 4.2 4.1 4.1
+run 3: 4.1 4.1 4.2 4.2 4.2
+```
 
 ## Verdicts
 
